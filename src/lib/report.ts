@@ -8,6 +8,14 @@ export function buildMarkdownReport(result: ReviewResult): string {
   lines.push(`**Language:** ${result.language}  `);
   lines.push(`**Grade:** ${result.grade}`);
   lines.push("");
+  if (result.structure) {
+    const s = result.structure;
+    lines.push(`**Repository:** ${s.repo} @ ${s.branch}  `);
+    lines.push(`**Files:** ${s.totalFiles}  `);
+    lines.push(`**Languages:** ${s.languages.map((l) => `${l.name} (${l.count})`).join(", ")}  `);
+    if (s.filesReviewed.length) lines.push(`**Deep-reviewed:** ${s.filesReviewed.join(", ")}`);
+    lines.push("");
+  }
   lines.push(`> ${result.summary}`);
   lines.push("");
 
