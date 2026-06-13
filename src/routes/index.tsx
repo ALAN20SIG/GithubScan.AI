@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { reviewCode } from "@/lib/review.functions";
+import { reviewRepo } from "@/lib/repo-review.functions";
 import { buildMarkdownReport } from "@/lib/report";
 import type { Category } from "@/lib/codescan-types";
 import { CATEGORIES } from "@/lib/codescan-types";
@@ -37,12 +38,19 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { code, lang } = Route.useSearch();
   const review = useServerFn(reviewCode);
+  const repoReview = useServerFn(reviewRepo);
   const [activeTab, setActiveTab] = useState<Category>("bugs");
   const [copied, setCopied] = useState(false);
   const autoRan = useRef(false);
 
   const mutation = useMutation({
     mutationFn: (vars: { code: string; language: string }) => review({ data: vars }),
+    onSuccess: () => setActiveTab("bugs"),
+  });
+
+  const repoMutation = useMutation({
+    mutationFn: (vars: { url: string; branch: string }) =>
+      repoReview({ data: { url: vars.url, branch: vars.branch || undefined } }),
     onSuccess: () => setActiveTab("bugs"),
   });
 
@@ -59,10 +67,17 @@ function Index() {
     mutation.mutate({ code: c, language });
   };
 
+  const handleRepoSubmit = (url: string, branch: string) => {
+    repoMutation.mutate({ url, branch });
+  };
+
+  const data = mutation.data ?? repoMutation.data;
+  const isPending = mutation.isPending || repoMutation.isPending;
+
   const handleCopy = async () => {
-    if (!mutation.data) return;
+    if (!data) return;
     try {
-      await navigator.clipboard.writeText(buildMarkdownReport(mutation.data));
+      await navigator.clipboard.writeText(buildMarkdownReport(data));
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -70,26 +85,30 @@ function Index() {
     }
   };
 
+  const activeError = mutation.error ?? repoMutation.error;
   const errorMessage =
-    mutation.error instanceof Error ? mutation.error.message : mutation.error ? "Something went wrong." : null;
+    activeError instanceof Error ? activeError.message : activeError ? "Something went wrong." : null;
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-cs-bg font-sans text-cs-text">
-      {mutation.isPending ? (
+      {isPending ? (
         <ScanningState />
-      ) : mutation.data ? (
+      ) : data ? (
         <ResultView
-          result={mutation.data}
+          result={data}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          onReviewAgain={() => mutation.reset()}
+          onReviewAgain={() => {
+            mutation.reset();
+            repoMutation.reset();
+          }}
           onCopy={handleCopy}
           copied={copied}
         />
       ) : (
         <>
           <TopBar language="—" grade="—" />
-          <ManualInput onSubmit={handleSubmit} error={errorMessage} />
+          <ManualInput onSubmit={handleSubmit} onRepoSubmit={handleRepoSubmit} error={errorMessage} />
         </>
       )}
     </div>
@@ -117,6 +136,7 @@ function ResultView({
   return (
     <>
       <TopBar language={result.language} grade={result.grade} />
+      {result.structure && <RepoStructurePanel structure={result.structure} />}
       {result.summary && (
         <p className="border-b border-cs-border bg-cs-surface px-3 py-2 text-xs leading-relaxed text-cs-muted">
           {result.summary}
