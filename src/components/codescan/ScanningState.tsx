@@ -7,7 +7,7 @@ export function ScanningState() {
       <motion.div
         animate={{ opacity: [0.4, 1, 0.4] }}
         transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-        className="w-full max-w-xs space-y-2 rounded-lg border border-cs-border bg-cs-surface p-4"
+        className="w-full max-w-lg space-y-2 rounded-lg border border-cs-border bg-cs-surface p-4"
       >
         {[80, 60, 90, 50, 70].map((w, i) => (
           <div

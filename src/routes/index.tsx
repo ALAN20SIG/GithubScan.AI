@@ -8,7 +8,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { reviewCode } from "@/lib/review.functions";
 import { reviewRepo } from "@/lib/repo-review.functions";
 import { generateEdgeCaseTests } from "@/lib/test-runner.functions";
-import { runGeneratedTests } from "@/lib/run-tests.client";
 import { buildMarkdownReport } from "@/lib/report";
 import type { Category } from "@/lib/codescan-types";
 import { CATEGORIES } from "@/lib/codescan-types";
@@ -61,6 +60,7 @@ function Index() {
 
   const testMutation = useMutation({
     mutationFn: async (vars: { code: string; language: string }) => {
+      const { runGeneratedTests } = await import("@/lib/run-tests");
       const plan = await genTests({ data: vars });
       return runGeneratedTests(plan);
     },
@@ -125,7 +125,7 @@ function Index() {
     activeError instanceof Error ? activeError.message : activeError ? "Something went wrong." : null;
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-cs-bg font-sans text-cs-text">
+    <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col bg-cs-bg font-sans text-cs-text">
       {isPending ? (
         <ScanningState />
       ) : data ? (
@@ -189,7 +189,7 @@ function ResultView({
       <TopBar language={result.language} grade={result.grade} />
       {result.structure && <RepoStructurePanel structure={result.structure} />}
       {result.summary && (
-        <p className="border-b border-cs-border bg-cs-surface px-3 py-2 text-xs leading-relaxed text-cs-muted">
+        <p className="border-b border-cs-border bg-cs-surface px-4 py-3 text-sm leading-relaxed text-cs-muted md:px-6">
           {result.summary}
         </p>
       )}
@@ -201,7 +201,7 @@ function ResultView({
         canRun={canRunTests}
       />
       <CategoryTabs active={activeTab} onChange={setActiveTab} findings={result.findings} />
-      <div className="flex-1 overflow-y-auto px-3 py-3">
+      <div className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -209,10 +209,10 @@ function ResultView({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -8 }}
             transition={{ duration: 0.18 }}
-            className="flex flex-col gap-2"
+            className="grid grid-cols-1 gap-3 xl:grid-cols-2"
           >
             {items.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 py-12 text-center">
+              <div className="col-span-full flex flex-col items-center gap-2 py-12 text-center">
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-cs-success/15 text-lg text-cs-success">
                   ✓
                 </span>
@@ -236,40 +236,40 @@ function RepoStructurePanel({
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-cs-border bg-cs-surface px-3 py-2.5">
+    <div className="border-b border-cs-border bg-cs-surface px-4 py-3 md:px-6">
       <div className="flex items-center justify-between gap-2">
-        <p className="min-w-0 truncate font-mono text-xs font-bold text-cs-text">
+        <p className="min-w-0 truncate font-mono text-sm font-bold text-cs-text">
           {structure.repo}
           <span className="ml-1.5 font-normal text-cs-muted">@ {structure.branch}</span>
         </p>
-        <span className="shrink-0 rounded-md border border-cs-border bg-cs-surface-2 px-2 py-0.5 font-mono text-[10px] text-cs-muted">
+        <span className="shrink-0 rounded-md border border-cs-border bg-cs-surface-2 px-2.5 py-1 font-mono text-xs text-cs-muted">
           {structure.totalFiles} files
         </span>
       </div>
-      <div className="mt-1.5 flex flex-wrap gap-1.5">
-        {structure.languages.slice(0, 5).map((l) => (
+      <div className="mt-2 flex flex-wrap gap-2">
+        {structure.languages.slice(0, 8).map((l) => (
           <span
             key={l.name}
-            className="rounded-md bg-cs-info/15 px-1.5 py-0.5 font-mono text-[10px] text-cs-info"
+            className="rounded-md bg-cs-info/15 px-2 py-1 font-mono text-xs text-cs-info"
           >
             {l.name} · {l.count}
           </span>
         ))}
       </div>
       {structure.filesReviewed.length > 0 && (
-        <p className="mt-1.5 text-[10px] text-cs-muted">
+        <p className="mt-2 text-xs text-cs-muted">
           Deep-reviewed: {structure.filesReviewed.join(", ")}
         </p>
       )}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="mt-1.5 font-mono text-[10px] text-cs-info hover:underline"
+        className="mt-2 font-mono text-xs text-cs-info hover:underline"
       >
         {open ? "Hide file tree" : "Show file tree"}
       </button>
       {open && (
-        <pre className="mt-1.5 max-h-48 overflow-auto rounded-md border border-cs-border bg-cs-bg p-2 font-mono text-[10px] leading-relaxed text-cs-muted">
+        <pre className="mt-2 max-h-64 overflow-auto rounded-md border border-cs-border bg-cs-bg p-3 font-mono text-xs leading-relaxed text-cs-muted">
           {structure.tree.join("\n")}
         </pre>
       )}
