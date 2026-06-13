@@ -7,7 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { reviewCode } from "@/lib/review.functions";
 import { reviewRepo } from "@/lib/repo-review.functions";
-import { runEdgeCaseTests } from "@/lib/test-runner.functions";
+import { generateEdgeCaseTests } from "@/lib/test-runner.functions";
+import { runGeneratedTests } from "@/lib/run-tests.client";
 import { buildMarkdownReport } from "@/lib/report";
 import type { Category } from "@/lib/codescan-types";
 import { CATEGORIES } from "@/lib/codescan-types";
@@ -41,7 +42,7 @@ function Index() {
   const { code, lang } = Route.useSearch();
   const review = useServerFn(reviewCode);
   const repoReview = useServerFn(reviewRepo);
-  const runTests = useServerFn(runEdgeCaseTests);
+  const genTests = useServerFn(generateEdgeCaseTests);
   const [activeTab, setActiveTab] = useState<Category>("bugs");
   const [copied, setCopied] = useState(false);
   const [tested, setTested] = useState<{ code: string; language: string }>({ code: "", language: "" });
@@ -59,7 +60,10 @@ function Index() {
   });
 
   const testMutation = useMutation({
-    mutationFn: (vars: { code: string; language: string }) => runTests({ data: vars }),
+    mutationFn: async (vars: { code: string; language: string }) => {
+      const plan = await genTests({ data: vars });
+      return runGeneratedTests(plan);
+    },
   });
 
   useEffect(() => {
