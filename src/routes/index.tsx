@@ -60,6 +60,7 @@ function Index() {
 
   const testMutation = useMutation({
     mutationFn: async (vars: { code: string; language: string }) => {
+      const { runGeneratedTests } = await import("@/lib/run-tests.client");
       const plan = await genTests({ data: vars });
       return runGeneratedTests(plan);
     },
