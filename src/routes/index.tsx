@@ -170,3 +170,51 @@ function ResultView({
     </>
   );
 }
+
+function RepoStructurePanel({
+  structure,
+}: {
+  structure: import("@/lib/codescan-types").RepoStructure;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-cs-border bg-cs-surface px-3 py-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <p className="min-w-0 truncate font-mono text-xs font-bold text-cs-text">
+          {structure.repo}
+          <span className="ml-1.5 font-normal text-cs-muted">@ {structure.branch}</span>
+        </p>
+        <span className="shrink-0 rounded-md border border-cs-border bg-cs-surface-2 px-2 py-0.5 font-mono text-[10px] text-cs-muted">
+          {structure.totalFiles} files
+        </span>
+      </div>
+      <div className="mt-1.5 flex flex-wrap gap-1.5">
+        {structure.languages.slice(0, 5).map((l) => (
+          <span
+            key={l.name}
+            className="rounded-md bg-cs-info/15 px-1.5 py-0.5 font-mono text-[10px] text-cs-info"
+          >
+            {l.name} · {l.count}
+          </span>
+        ))}
+      </div>
+      {structure.filesReviewed.length > 0 && (
+        <p className="mt-1.5 text-[10px] text-cs-muted">
+          Deep-reviewed: {structure.filesReviewed.join(", ")}
+        </p>
+      )}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="mt-1.5 font-mono text-[10px] text-cs-info hover:underline"
+      >
+        {open ? "Hide file tree" : "Show file tree"}
+      </button>
+      {open && (
+        <pre className="mt-1.5 max-h-48 overflow-auto rounded-md border border-cs-border bg-cs-bg p-2 font-mono text-[10px] leading-relaxed text-cs-muted">
+          {structure.tree.join("\n")}
+        </pre>
+      )}
+    </div>
+  );
+}
