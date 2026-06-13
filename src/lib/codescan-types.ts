@@ -15,6 +15,16 @@ export interface ReviewResult {
   grade: string;
   summary: string;
   findings: Finding[];
+  structure?: RepoStructure;
+}
+
+export interface RepoStructure {
+  repo: string;
+  branch: string;
+  totalFiles: number;
+  languages: { name: string; count: number }[];
+  tree: string[];
+  filesReviewed: string[];
 }
 
 export const CATEGORIES: { key: Category; label: string }[] = [
