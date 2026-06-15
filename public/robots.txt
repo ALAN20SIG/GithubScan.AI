@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ntellicode-pal.lovable.app/sitemap.xml

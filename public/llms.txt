@@ -1,0 +1,10 @@
+# CodeScan AI
+
+> AI-powered code reviewer that detects bugs, security vulnerabilities, and quality issues, then generates and runs edge-case tests, a full test suite, and a simulated CI/CD pipeline.
+
+CodeScan AI lets developers paste code or point to a public GitHub file or repository and receive an instant AI review covering bugs, security, quality, and suggestions — plus automated edge-case testing, a multi-category test suite (unit, functional, API, A/B, vulnerability, CI/CD) with an evaluation grade, and a simulated CI/CD pipeline run.
+
+## Pages
+
+- [Home](/): Review code or a GitHub repo and run AI-generated tests and pipelines.
+- [AI Security Code Review Guide](/guides/security-code-review): How to use AI to find security vulnerabilities in code.
