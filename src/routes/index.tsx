@@ -231,8 +231,8 @@ function ResultView({
   pipelineError,
 }: {
   result: import("@/lib/codescan-types").ReviewResult;
-  activeTab: Category;
-  setActiveTab: (c: Category) => void;
+  activeTab: ViewTab;
+  setActiveTab: (c: ViewTab) => void;
   onReviewAgain: () => void;
   onCopy: () => void;
   copied: boolean;
