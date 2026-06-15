@@ -276,14 +276,23 @@ function ResultView({
         error={suiteError}
         canRun={canRunTests}
       />
-      <PipelinePanel
-        onRun={onRunPipeline}
-        isPending={pipelinePending}
-        result={pipelineResult}
-        error={pipelineError}
-        canRun={canRunTests}
+      <CategoryTabs
+        active={activeTab}
+        onChange={setActiveTab}
+        findings={result.findings}
+        pipelineStatus={pipelineResult ? (pipelineResult.success ? "passed" : "failed") : null}
       />
-      <CategoryTabs active={activeTab} onChange={setActiveTab} findings={result.findings} />
+      {activeTab === "cicd" ? (
+        <div className="flex-1 overflow-y-auto">
+          <PipelinePanel
+            onRun={onRunPipeline}
+            isPending={pipelinePending}
+            result={pipelineResult}
+            error={pipelineError}
+            canRun={canRunTests}
+          />
+        </div>
+      ) : (
       <div className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
         <AnimatePresence mode="wait">
           <motion.div
@@ -307,6 +316,7 @@ function ResultView({
           </motion.div>
         </AnimatePresence>
       </div>
+      )}
       <BottomBar onReviewAgain={onReviewAgain} onCopy={onCopy} copied={copied} />
     </>
   );
