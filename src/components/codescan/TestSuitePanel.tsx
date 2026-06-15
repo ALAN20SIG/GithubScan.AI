@@ -228,6 +228,16 @@ export function TestSuitePanel({
                   {run.suite.evaluation.verdict}
                 </p>
               )}
+              {run.suite.evaluation.reasoning && (
+                <div className="mt-3 rounded-md border border-cs-border bg-cs-bg p-3">
+                  <p className="text-xs font-bold uppercase tracking-wide text-cs-muted">
+                    Reasoning
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-cs-text">
+                    {run.suite.evaluation.reasoning}
+                  </p>
+                </div>
+              )}
               {run.suite.evaluation.recommendations.length > 0 && (
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-relaxed text-cs-muted">
                   {run.suite.evaluation.recommendations.map((rec, i) => (
