@@ -2,6 +2,8 @@
 
 AI-powered code review for bugs, security vulnerabilities, quality issues, improvement suggestions, and comprehensive testing. Supports manual code input, full GitHub repository analysis, automated edge-case testing, full test suite generation, and CI/CD pipeline simulation.
 
+![GithubScan AI Screenshot](docs/screenshot.png)
+
 ![Tech Stack](https://img.shields.io/badge/TanStack%20Start-v1-blue)
 ![React](https://img.shields.io/badge/React-19-61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6)
