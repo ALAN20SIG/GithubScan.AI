@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { reviewCode } from "@/lib/review.functions";
 import { reviewRepo } from "@/lib/repo-review.functions";
 import { generateEdgeCaseTests } from "@/lib/test-runner.functions";
+import { generateTestSuite } from "@/lib/test-suite.functions";
 import { buildMarkdownReport } from "@/lib/report";
 import type { Category } from "@/lib/codescan-types";
 import { CATEGORIES } from "@/lib/codescan-types";
@@ -17,6 +18,7 @@ import { FindingCard } from "@/components/codescan/FindingCard";
 import { ScanningState } from "@/components/codescan/ScanningState";
 import { ManualInput } from "@/components/codescan/ManualInput";
 import { TestPanel } from "@/components/codescan/TestPanel";
+import { TestSuitePanel } from "@/components/codescan/TestSuitePanel";
 import { BottomBar } from "@/components/codescan/BottomBar";
 
 const searchSchema = z.object({
@@ -42,6 +44,7 @@ function Index() {
   const review = useServerFn(reviewCode);
   const repoReview = useServerFn(reviewRepo);
   const genTests = useServerFn(generateEdgeCaseTests);
+  const genSuite = useServerFn(generateTestSuite);
   const [activeTab, setActiveTab] = useState<Category>("bugs");
   const [copied, setCopied] = useState(false);
   const [tested, setTested] = useState<{ code: string; language: string }>({ code: "", language: "" });
@@ -63,6 +66,14 @@ function Index() {
       const { runGeneratedTests } = await import("@/lib/run-tests");
       const plan = await genTests({ data: vars });
       return runGeneratedTests(plan);
+    },
+  });
+
+  const suiteMutation = useMutation({
+    mutationFn: async (vars: { code: string; language: string }) => {
+      const { runTestSuite } = await import("@/lib/run-suite");
+      const suite = await genSuite({ data: vars });
+      return runTestSuite(suite);
     },
   });
 
@@ -102,11 +113,23 @@ function Index() {
     testMutation.mutate({ code: testCode, language: testLang });
   };
 
+  const handleRunSuite = () => {
+    if (!canRunTests) return;
+    suiteMutation.mutate({ code: testCode, language: testLang });
+  };
+
   const testError =
     testMutation.error instanceof Error
       ? testMutation.error.message
       : testMutation.error
         ? "Test run failed."
+        : null;
+
+  const suiteError =
+    suiteMutation.error instanceof Error
+      ? suiteMutation.error.message
+      : suiteMutation.error
+        ? "Test suite failed."
         : null;
 
   const handleCopy = async () => {
@@ -137,6 +160,7 @@ function Index() {
             mutation.reset();
             repoMutation.reset();
             testMutation.reset();
+            suiteMutation.reset();
           }}
           onCopy={handleCopy}
           copied={copied}
@@ -145,6 +169,10 @@ function Index() {
           testResult={testMutation.data ?? null}
           testError={testError}
           canRunTests={canRunTests}
+          onRunSuite={handleRunSuite}
+          suitePending={suiteMutation.isPending}
+          suiteRun={suiteMutation.data ?? null}
+          suiteError={suiteError}
         />
       ) : (
         <>
