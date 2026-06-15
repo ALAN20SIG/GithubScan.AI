@@ -133,8 +133,12 @@ export const generateTestSuite = createServerFn({ method: "POST" })
           code?: string;
         }[];
       }[];
-      evaluation?: { grade?: string; verdict?: string; recommendations?: string[] };
-      // reasoning is parsed below via a widened access
+      evaluation?: {
+        grade?: string;
+        verdict?: string;
+        reasoning?: string;
+        recommendations?: string[];
+      };
     };
     try {
       parsed = extractJson(result.text) as typeof parsed;
@@ -187,6 +191,7 @@ export const generateTestSuite = createServerFn({ method: "POST" })
       evaluation: {
         grade: parsed.evaluation?.grade ?? "—",
         verdict: parsed.evaluation?.verdict ?? "",
+        reasoning: parsed.evaluation?.reasoning?.trim() ?? "",
         recommendations: Array.isArray(parsed.evaluation?.recommendations)
           ? parsed.evaluation!.recommendations.filter((r) => typeof r === "string")
           : [],
