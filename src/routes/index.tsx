@@ -196,6 +196,10 @@ function ResultView({
   testResult,
   testError,
   canRunTests,
+  onRunSuite,
+  suitePending,
+  suiteRun,
+  suiteError,
 }: {
   result: import("@/lib/codescan-types").ReviewResult;
   activeTab: Category;
@@ -208,6 +212,10 @@ function ResultView({
   testResult: import("@/lib/codescan-types").TestRunResult | null;
   testError: string | null;
   canRunTests: boolean;
+  onRunSuite: () => void;
+  suitePending: boolean;
+  suiteRun: import("@/lib/codescan-types").TestSuiteRun | null;
+  suiteError: string | null;
 }) {
   const items = result.findings.filter((f) => f.category === activeTab);
   const tabLabel = CATEGORIES.find((c) => c.key === activeTab)?.label ?? "";
@@ -226,6 +234,13 @@ function ResultView({
         isPending={testPending}
         result={testResult}
         error={testError}
+        canRun={canRunTests}
+      />
+      <TestSuitePanel
+        onRun={onRunSuite}
+        isPending={suitePending}
+        run={suiteRun}
+        error={suiteError}
         canRun={canRunTests}
       />
       <CategoryTabs active={activeTab} onChange={setActiveTab} findings={result.findings} />
