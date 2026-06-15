@@ -171,6 +171,7 @@ export function TestSuitePanel({
   error: string | null;
   canRun: boolean;
 }) {
+  const [showReasoning, setShowReasoning] = useState(true);
   return (
     <div className="border-b border-cs-border bg-cs-bg px-4 py-4 md:px-6">
       <div className="flex items-center justify-between gap-2">
