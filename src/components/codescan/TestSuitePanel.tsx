@@ -221,7 +221,7 @@ export function TestSuitePanel({
                 <span className="rounded-md bg-cs-critical/15 px-2 py-1 font-mono text-xs font-bold text-cs-critical">
                   {run.failed} failed
                 </span>
-                <span className="rounded-md bg-cs-surface-2 px-2 py-1 font-mono text-xs text-cs-muted">
+                <span className="rounded-full bg-cs-surface-2 px-2 py-1 font-mono text-xs text-cs-muted">
                   {run.executed} executed
                 </span>
               </div>
