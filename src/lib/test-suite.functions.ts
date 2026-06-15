@@ -140,8 +140,9 @@ export const generateTestSuite = createServerFn({ method: "POST" })
       throw new Error("Could not parse the AI response. Please try again.");
     }
 
+    type RawSection = NonNullable<typeof parsed.sections>[number];
     const language = parsed.language ?? data.language;
-    const byKey = new Map<SuiteKey, (typeof parsed.sections)[number]>();
+    const byKey = new Map<SuiteKey, RawSection>();
     for (const s of parsed.sections ?? []) {
       if (s.key && SECTION_ORDER.includes(s.key as SuiteKey)) {
         byKey.set(s.key as SuiteKey, s);
@@ -153,7 +154,7 @@ export const generateTestSuite = createServerFn({ method: "POST" })
       const rawCases = Array.isArray(raw?.cases)
         ? raw!.cases.slice(0, MAX_CASES_PER_SECTION)
         : [];
-      const cases: SuiteCase[] = rawCases.map((c, i) => {
+      const cases: SuiteCase[] = rawCases.map((c, i: number) => {
         const executable =
           c.executable === true &&
           typeof c.code === "string" &&
