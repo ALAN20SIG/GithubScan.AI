@@ -84,6 +84,8 @@ export interface SuiteSection {
 export interface SuiteEvaluation {
   grade: string;
   verdict: string;
+  /** Step-by-step reasoning behind the grade and verdict. */
+  reasoning: string;
   recommendations: string[];
 }
 

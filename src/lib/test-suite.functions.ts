@@ -39,6 +39,7 @@ Respond with ONLY a single JSON object (no markdown fences, no prose), shaped ex
   "evaluation": {
     "grade": "B+",
     "verdict": "1-2 sentence overall assessment of test coverage and code testability",
+    "reasoning": "3-5 sentences explaining HOW you reached this grade: coverage across categories, executable vs informational balance, risks found, testability of the code, and what most influenced the grade",
     "recommendations": ["actionable improvement", "..."]
   }
 }
@@ -132,7 +133,12 @@ export const generateTestSuite = createServerFn({ method: "POST" })
           code?: string;
         }[];
       }[];
-      evaluation?: { grade?: string; verdict?: string; recommendations?: string[] };
+      evaluation?: {
+        grade?: string;
+        verdict?: string;
+        reasoning?: string;
+        recommendations?: string[];
+      };
     };
     try {
       parsed = extractJson(result.text) as typeof parsed;
@@ -185,6 +191,7 @@ export const generateTestSuite = createServerFn({ method: "POST" })
       evaluation: {
         grade: parsed.evaluation?.grade ?? "—",
         verdict: parsed.evaluation?.verdict ?? "",
+        reasoning: parsed.evaluation?.reasoning?.trim() ?? "",
         recommendations: Array.isArray(parsed.evaluation?.recommendations)
           ? parsed.evaluation!.recommendations.filter((r) => typeof r === "string")
           : [],

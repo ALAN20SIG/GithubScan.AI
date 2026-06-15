@@ -261,27 +261,35 @@ function ResultView({
           {result.summary}
         </p>
       )}
-      <TestPanel
-        onRun={onRunTests}
-        isPending={testPending}
-        result={testResult}
-        error={testError}
-        canRun={canRunTests}
-      />
-      <TestSuitePanel
-        onRun={onRunSuite}
-        isPending={suitePending}
-        run={suiteRun}
-        error={suiteError}
-        canRun={canRunTests}
-      />
       <CategoryTabs
         active={activeTab}
         onChange={setActiveTab}
         findings={result.findings}
+        edgeStatus={testResult ? (testResult.failed === 0 ? "passed" : "failed") : null}
+        suiteStatus={suiteRun ? (suiteRun.failed === 0 ? "passed" : "failed") : null}
         pipelineStatus={pipelineResult ? (pipelineResult.success ? "passed" : "failed") : null}
       />
-      {activeTab === "cicd" ? (
+      {activeTab === "edge" ? (
+        <div className="flex-1 overflow-y-auto">
+          <TestPanel
+            onRun={onRunTests}
+            isPending={testPending}
+            result={testResult}
+            error={testError}
+            canRun={canRunTests}
+          />
+        </div>
+      ) : activeTab === "suite" ? (
+        <div className="flex-1 overflow-y-auto">
+          <TestSuitePanel
+            onRun={onRunSuite}
+            isPending={suitePending}
+            run={suiteRun}
+            error={suiteError}
+            canRun={canRunTests}
+          />
+        </div>
+      ) : activeTab === "cicd" ? (
         <div className="flex-1 overflow-y-auto">
           <PipelinePanel
             onRun={onRunPipeline}

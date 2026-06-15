@@ -11,6 +11,10 @@ function buildReport(run: TestSuiteRun): string {
   lines.push("");
   lines.push(`Overall grade: ${suite.evaluation.grade}`);
   lines.push(`Verdict: ${suite.evaluation.verdict}`);
+  if (suite.evaluation.reasoning) {
+    lines.push("");
+    lines.push(`Reasoning: ${suite.evaluation.reasoning}`);
+  }
   lines.push("");
   lines.push(`Executable cases: ${run.executed}  |  Passed: ${run.passed}  |  Failed: ${run.failed}`);
   lines.push("");
@@ -223,6 +227,16 @@ export function TestSuitePanel({
                 <p className="mt-2 text-sm leading-relaxed text-cs-text">
                   {run.suite.evaluation.verdict}
                 </p>
+              )}
+              {run.suite.evaluation.reasoning && (
+                <div className="mt-3 rounded-md border border-cs-border bg-cs-bg p-3">
+                  <p className="text-xs font-bold uppercase tracking-wide text-cs-muted">
+                    Reasoning
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-cs-text">
+                    {run.suite.evaluation.reasoning}
+                  </p>
+                </div>
               )}
               {run.suite.evaluation.recommendations.length > 0 && (
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-relaxed text-cs-muted">
