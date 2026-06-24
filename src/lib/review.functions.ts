@@ -1,11 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
+import { modelSchema } from "./models";
 import type { ReviewResult } from "./codescan-types";
 
 const ReviewInput = z.object({
   code: z.string().trim().min(1, "Code cannot be empty").max(60000),
   language: z.string().trim().min(1).max(40),
+  model: modelSchema,
 });
 
 const SYSTEM_PROMPT = `You are CodeScan AI, an expert code reviewer.
@@ -57,7 +59,7 @@ export const reviewCode = createServerFn({ method: "POST" })
     let result;
     try {
       result = await generateText({
-        model: gateway("google/gemini-3-flash-preview"),
+        model: gateway(data.model),
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           {

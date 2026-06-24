@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
+import { modelSchema } from "./models";
 import type {
   PipelineResult,
   PipelineStage,
@@ -11,6 +12,7 @@ import type {
 const PipelineInput = z.object({
   code: z.string().trim().min(1).max(80000),
   language: z.string().trim().min(1).max(40),
+  model: modelSchema,
 });
 
 const STAGE_ORDER: PipelineStageKey[] = [
@@ -89,7 +91,7 @@ export const runPipeline = createServerFn({ method: "POST" })
     let result;
     try {
       result = await generateText({
-        model: gateway("google/gemini-3-flash-preview"),
+        model: gateway(data.model),
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: `Language: ${data.language}\n\nCode:\n${data.code}` },
