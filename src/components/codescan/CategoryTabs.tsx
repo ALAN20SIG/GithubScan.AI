@@ -1,6 +1,6 @@
 import { CATEGORIES, type Category, type Finding } from "@/lib/codescan-types";
 
-export type ViewTab = Category | "edge" | "suite" | "cicd";
+export type ViewTab = Category | "edge" | "suite" | "cicd" | "arch";
 
 type Status = "passed" | "failed" | null;
 
@@ -25,6 +25,7 @@ export function CategoryTabs({
   edgeStatus = null,
   suiteStatus = null,
   pipelineStatus = null,
+  archStatus = null,
 }: {
   active: ViewTab;
   onChange: (c: ViewTab) => void;
@@ -32,6 +33,7 @@ export function CategoryTabs({
   edgeStatus?: Status;
   suiteStatus?: Status;
   pipelineStatus?: Status;
+  archStatus?: Status;
 }) {
   const tabClass = (isActive: boolean) =>
     `flex flex-col items-center gap-1.5 rounded-md px-2 py-2 text-sm font-medium transition-colors ${
@@ -44,10 +46,11 @@ export function CategoryTabs({
     { key: "edge", label: "Edge", status: edgeStatus },
     { key: "suite", label: "Suite", status: suiteStatus },
     { key: "cicd", label: "CI/CD", status: pipelineStatus },
+    { key: "arch", label: "Arch", status: archStatus },
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-2 border-b border-cs-border bg-cs-bg px-3 py-3 sm:grid-cols-7 md:px-6">
+    <div className="grid grid-cols-4 gap-2 border-b border-cs-border bg-cs-bg px-3 py-3 sm:grid-cols-8 md:px-6">
       {CATEGORIES.map(({ key, label }) => {
         const count = findings.filter((f) => f.category === key).length;
         const isActive = key === active;
