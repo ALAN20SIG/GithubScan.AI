@@ -173,6 +173,49 @@ export const CATEGORIES: { key: Category; label: string }[] = [
   { key: "suggestions", label: "Suggestions" },
 ];
 
+export type ArchNodeType =
+  | "client"
+  | "service"
+  | "api"
+  | "database"
+  | "external"
+  | "queue"
+  | "storage"
+  | "other";
+
+export interface ArchNode {
+  id: string;
+  label: string;
+  type: ArchNodeType;
+  /** Index of the layer this node belongs to (0 = top / entry). */
+  layer: number;
+  description: string;
+}
+
+export interface ArchEdge {
+  from: string;
+  to: string;
+  label: string;
+}
+
+export interface ArchIssue {
+  severity: Severity;
+  area: string;
+  title: string;
+  description: string;
+  recommendation: string;
+}
+
+export interface ArchitectureResult {
+  language: string;
+  overview: string;
+  layers: string[];
+  nodes: ArchNode[];
+  edges: ArchEdge[];
+  issues: ArchIssue[];
+  grade: string;
+}
+
 export const LANGUAGES = [
   "JavaScript",
   "TypeScript",
