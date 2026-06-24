@@ -1,11 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
+import { modelSchema } from "./models";
 import type { TestSuite, SuiteKey, SuiteSection, SuiteCase } from "./codescan-types";
 
 const SuiteInput = z.object({
   code: z.string().trim().min(1).max(80000),
   language: z.string().trim().min(1).max(40),
+  model: modelSchema,
 });
 
 const MAX_CASES_PER_SECTION = 6;
@@ -101,7 +103,7 @@ export const generateTestSuite = createServerFn({ method: "POST" })
     let result;
     try {
       result = await generateText({
-        model: gateway("google/gemini-3-flash-preview"),
+        model: gateway(data.model),
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: `Language: ${data.language}\n\nCode:\n${data.code}` },

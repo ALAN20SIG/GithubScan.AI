@@ -1,11 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
+import { modelSchema } from "./models";
 import type { ReviewResult, RepoStructure } from "./codescan-types";
 
 const RepoInput = z.object({
   url: z.string().trim().min(1).max(2048),
   branch: z.string().trim().max(120).optional(),
+  model: modelSchema,
 });
 
 const EXT_TO_LANG: Record<string, string> = {
@@ -240,7 +242,7 @@ ${fileBlocks.join("\n\n") || "(none could be fetched)"}`;
       const { createLovableAiGatewayProvider } = await import("./ai-gateway.server");
       const gateway = createLovableAiGatewayProvider(key);
       result = await generateText({
-        model: gateway("google/gemini-3-flash-preview"),
+        model: gateway(data.model),
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userContent },
