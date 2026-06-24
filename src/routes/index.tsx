@@ -69,26 +69,30 @@ function Index() {
   const genTests = useServerFn(generateEdgeCaseTests);
   const genSuite = useServerFn(generateTestSuite);
   const runCi = useServerFn(runPipeline);
+  const analyzeArch = useServerFn(analyzeArchitecture);
+  const [model] = useModel();
+  const [configOpen, setConfigOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<ViewTab>("bugs");
   const [copied, setCopied] = useState(false);
   const [tested, setTested] = useState<{ code: string; language: string }>({ code: "", language: "" });
   const autoRan = useRef(false);
 
   const mutation = useMutation({
-    mutationFn: (vars: { code: string; language: string }) => review({ data: vars }),
+    mutationFn: (vars: { code: string; language: string }) =>
+      review({ data: { ...vars, model } }),
     onSuccess: () => setActiveTab("bugs"),
   });
 
   const repoMutation = useMutation({
     mutationFn: (vars: { url: string; branch: string }) =>
-      repoReview({ data: { url: vars.url, branch: vars.branch || undefined } }),
+      repoReview({ data: { url: vars.url, branch: vars.branch || undefined, model } }),
     onSuccess: () => setActiveTab("bugs"),
   });
 
   const testMutation = useMutation({
     mutationFn: async (vars: { code: string; language: string }) => {
       const { runGeneratedTests } = await import("@/lib/run-tests");
-      const plan = await genTests({ data: vars });
+      const plan = await genTests({ data: { ...vars, model } });
       return runGeneratedTests(plan);
     },
   });
@@ -96,13 +100,19 @@ function Index() {
   const suiteMutation = useMutation({
     mutationFn: async (vars: { code: string; language: string }) => {
       const { runTestSuite } = await import("@/lib/run-suite");
-      const suite = await genSuite({ data: vars });
+      const suite = await genSuite({ data: { ...vars, model } });
       return runTestSuite(suite);
     },
   });
 
   const pipelineMutation = useMutation({
-    mutationFn: (vars: { code: string; language: string }) => runCi({ data: vars }),
+    mutationFn: (vars: { code: string; language: string }) =>
+      runCi({ data: { ...vars, model } }),
+  });
+
+  const archMutation = useMutation({
+    mutationFn: (vars: { code: string; language: string; tree?: string }) =>
+      analyzeArch({ data: { ...vars, model } }),
   });
 
   useEffect(() => {
