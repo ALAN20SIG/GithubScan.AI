@@ -161,6 +161,12 @@ function Index() {
     pipelineMutation.mutate({ code: testCode, language: testLang });
   };
 
+  const repoTree = repoMutation.data?.structure?.tree?.join("\n");
+  const handleRunArch = () => {
+    if (!canRunTests) return;
+    archMutation.mutate({ code: testCode, language: testLang, tree: repoTree });
+  };
+
   const testError =
     testMutation.error instanceof Error
       ? testMutation.error.message
@@ -180,6 +186,13 @@ function Index() {
       ? pipelineMutation.error.message
       : pipelineMutation.error
         ? "Pipeline run failed."
+        : null;
+
+  const archError =
+    archMutation.error instanceof Error
+      ? archMutation.error.message
+      : archMutation.error
+        ? "Architecture analysis failed."
         : null;
 
   const handleCopy = async () => {
