@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
 import { modelSchema } from "./models";
-import { skillGuidance, skillSchema } from "./skills";
+import { resolveGuidance, skillSchema, customGuidanceSchema } from "./skills";
 import type { ReviewResult, RepoStructure } from "./codescan-types";
 
 const RepoInput = z.object({
@@ -10,6 +10,7 @@ const RepoInput = z.object({
   branch: z.string().trim().max(120).optional(),
   model: modelSchema,
   skill: skillSchema,
+  customGuidance: customGuidanceSchema,
 });
 
 const EXT_TO_LANG: Record<string, string> = {
@@ -243,7 +244,7 @@ ${fileBlocks.join("\n\n") || "(none could be fetched)"}`;
     try {
       const { createLovableAiGatewayProvider } = await import("./ai-gateway.server");
       const gateway = createLovableAiGatewayProvider(key);
-      const guidance = skillGuidance(data.skill);
+      const guidance = resolveGuidance(data.skill, data.customGuidance);
       const systemPrompt = guidance ? `${SYSTEM_PROMPT}\n\n${guidance}` : SYSTEM_PROMPT;
       result = await generateText({
         model: gateway(data.model),
