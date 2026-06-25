@@ -3,6 +3,8 @@ import { DEFAULT_SKILL, SKILLS } from "./skills";
 
 const STORAGE_KEY = "codescan:skill";
 const EVENT = "codescan:skill-change";
+const CUSTOM_KEY = "codescan:skill-custom";
+const CUSTOM_EVENT = "codescan:skill-custom-change";
 
 function read(): string {
   if (typeof window === "undefined") return DEFAULT_SKILL;
@@ -31,4 +33,32 @@ export function useSkill(): [string, (id: string) => void] {
   }, []);
 
   return [skill, setSkill];
+}
+
+function readCustom(): string {
+  if (typeof window === "undefined") return "";
+  return window.localStorage.getItem(CUSTOM_KEY) ?? "";
+}
+
+/** Shared, persisted text of the user-supplied custom skill prompt. */
+export function useCustomGuidance(): [string, (text: string) => void] {
+  const [guidance, setGuidanceState] = useState<string>("");
+
+  useEffect(() => {
+    setGuidanceState(readCustom());
+    const sync = () => setGuidanceState(readCustom());
+    window.addEventListener(CUSTOM_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(CUSTOM_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+
+  const setGuidance = useCallback((text: string) => {
+    window.localStorage.setItem(CUSTOM_KEY, text);
+    window.dispatchEvent(new Event(CUSTOM_EVENT));
+  }, []);
+
+  return [guidance, setGuidance];
 }

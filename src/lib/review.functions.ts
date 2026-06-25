@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
 import { modelSchema } from "./models";
-import { skillGuidance, skillSchema } from "./skills";
+import { resolveGuidance, skillSchema, customGuidanceSchema } from "./skills";
 import type { ReviewResult } from "./codescan-types";
 
 const ReviewInput = z.object({
@@ -10,6 +10,7 @@ const ReviewInput = z.object({
   language: z.string().trim().min(1).max(40),
   model: modelSchema,
   skill: skillSchema,
+  customGuidance: customGuidanceSchema,
 });
 
 const SYSTEM_PROMPT = `You are CodeScan AI, an expert code reviewer.
@@ -58,7 +59,7 @@ export const reviewCode = createServerFn({ method: "POST" })
     const { createLovableAiGatewayProvider } = await import("./ai-gateway.server");
     const gateway = createLovableAiGatewayProvider(key);
 
-    const guidance = skillGuidance(data.skill);
+    const guidance = resolveGuidance(data.skill, data.customGuidance);
     const systemPrompt = guidance ? `${SYSTEM_PROMPT}\n\n${guidance}` : SYSTEM_PROMPT;
 
     let result;

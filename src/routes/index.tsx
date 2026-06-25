@@ -25,7 +25,7 @@ import { PipelinePanel } from "@/components/codescan/PipelinePanel";
 import { ArchitecturePanel } from "@/components/codescan/ArchitecturePanel";
 import { ModelConfigPanel } from "@/components/codescan/ModelConfigPanel";
 import { useModel } from "@/lib/use-model";
-import { useSkill } from "@/lib/use-skill";
+import { useSkill, useCustomGuidance } from "@/lib/use-skill";
 import { BottomBar } from "@/components/codescan/BottomBar";
 
 const searchSchema = z.object({
@@ -73,6 +73,7 @@ function Index() {
   const analyzeArch = useServerFn(analyzeArchitecture);
   const [model] = useModel();
   const [skill] = useSkill();
+  const [customGuidance] = useCustomGuidance();
   const [configOpen, setConfigOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<ViewTab>("bugs");
   const [copied, setCopied] = useState(false);
@@ -81,13 +82,13 @@ function Index() {
 
   const mutation = useMutation({
     mutationFn: (vars: { code: string; language: string }) =>
-      review({ data: { ...vars, model, skill } }),
+      review({ data: { ...vars, model, skill, customGuidance } }),
     onSuccess: () => setActiveTab("bugs"),
   });
 
   const repoMutation = useMutation({
     mutationFn: (vars: { url: string; branch: string }) =>
-      repoReview({ data: { url: vars.url, branch: vars.branch || undefined, model, skill } }),
+      repoReview({ data: { url: vars.url, branch: vars.branch || undefined, model, skill, customGuidance } }),
     onSuccess: () => setActiveTab("bugs"),
   });
 
