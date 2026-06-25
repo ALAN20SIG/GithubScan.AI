@@ -1,7 +1,8 @@
+import { useRef } from "react";
 import { MODELS } from "@/lib/models";
 import { useModel } from "@/lib/use-model";
-import { SKILLS } from "@/lib/skills";
-import { useSkill } from "@/lib/use-skill";
+import { SKILLS, CUSTOM_SKILL } from "@/lib/skills";
+import { useSkill, useCustomGuidance } from "@/lib/use-skill";
 
 export function ModelConfigPanel({
   open,
@@ -12,7 +13,18 @@ export function ModelConfigPanel({
 }) {
   const [model, setModel] = useModel();
   const [skill, setSkill] = useSkill();
+  const [customGuidance, setCustomGuidance] = useCustomGuidance();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   if (!open) return null;
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    setCustomGuidance(text.slice(0, 20000));
+    setSkill(CUSTOM_SKILL);
+    e.target.value = "";
+  };
 
   return (
     <div
@@ -68,6 +80,38 @@ export function ModelConfigPanel({
               </button>
             );
           })}
+          {skill === CUSTOM_SKILL && (
+            <div className="rounded-lg border border-cs-border bg-cs-bg p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <span className="text-xs font-bold text-cs-text">Custom review prompt</span>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="rounded-md border border-cs-border bg-cs-surface-2 px-2 py-1 text-[11px] font-bold text-cs-text transition-colors hover:bg-cs-surface"
+                >
+                  Upload SKILL.md
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".md,.markdown,.txt,text/markdown,text/plain"
+                  className="hidden"
+                  onChange={handleFile}
+                />
+              </div>
+              <textarea
+                value={customGuidance}
+                onChange={(e) => setCustomGuidance(e.target.value.slice(0, 20000))}
+                placeholder="Paste your SKILL.md-style review instructions here…"
+                className="h-40 w-full resize-y rounded-md border border-cs-border bg-cs-surface px-3 py-2 font-mono text-xs text-cs-text placeholder:text-cs-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cs-info"
+              />
+              <p className="mt-1 text-[11px] text-cs-muted">
+                {customGuidance.trim()
+                  ? `${customGuidance.length}/20000 characters`
+                  : "This text is injected into the reviewer's system prompt."}
+              </p>
+            </div>
+          )}
           <p className="px-1 pb-1 pt-3 text-[11px] font-bold uppercase tracking-wide text-cs-muted">
             AI model
           </p>
