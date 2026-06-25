@@ -33,9 +33,16 @@ Prioritize findings in this order:
 
 For every finding: be specific and actionable, cite the exact line/file, explain the concrete risk or impact, and give a fix the author can apply directly. Do not invent issues; if the code is clean, return an empty findings array. Grade strictly: reserve A-range grades for code with no correctness or security issues.`,
   },
+  {
+    id: "custom",
+    label: "Custom skill",
+    description: "Paste or upload your own SKILL.md-style review prompt.",
+    guidance: "",
+  },
 ];
 
 export const DEFAULT_SKILL = "code-review-and-quality";
+export const CUSTOM_SKILL = "custom";
 
 const SKILL_IDS = SKILLS.map((s) => s.id) as [string, ...string[]];
 
@@ -46,8 +53,20 @@ export const skillSchema = z
   .default(DEFAULT_SKILL)
   .catch(DEFAULT_SKILL);
 
+/** Server-side validator for a user-supplied custom skill prompt. */
+export const customGuidanceSchema = z.string().max(20000).optional();
+
 export function skillGuidance(id: string): string {
   return SKILLS.find((s) => s.id === id)?.guidance ?? "";
+}
+
+/**
+ * Resolve the guidance text to inject, honoring a user-supplied custom prompt
+ * when the "custom" skill is selected.
+ */
+export function resolveGuidance(id: string, custom?: string): string {
+  if (id === CUSTOM_SKILL) return (custom ?? "").trim();
+  return skillGuidance(id);
 }
 
 export function skillLabel(id: string): string {
