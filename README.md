@@ -1,13 +1,99 @@
-# GithubScan AI
+# CodeScan AI
 
-AI-powered code review for bugs, security vulnerabilities, quality issues, improvement suggestions, and comprehensive testing. Supports manual code input, full GitHub repository analysis, automated edge-case testing, full test suite generation, and CI/CD pipeline simulation.
+**AI-powered code review, testing, and architecture analysis — in your browser.**
 
-![GithubScan AI Screenshot](docs/screenshot.png)
+Paste a code snippet or point it at a public GitHub repository and CodeScan AI
+finds bugs, security vulnerabilities, and quality issues, then generates and
+runs tests, simulates a CI/CD pipeline, and reconstructs your architecture —
+all powered by configurable AI models.
+
+![CodeScan AI — code review results](docs/screens/03-review-bugs.png)
 
 ![Tech Stack](https://img.shields.io/badge/TanStack%20Start-v1-blue)
 ![React](https://img.shields.io/badge/React-19-61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6)
 ![Tailwind](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4)
+
+---
+
+## Screenshots & Features
+
+Each section below shows the actual UI for that capability.
+
+### Start a review
+
+Paste code directly, choose a language, or review an entire public GitHub repo
+(or a single file) — then hit **Review Code**.
+
+![Code input and GitHub repo entry](docs/screens/01-input.png)
+
+### Configure the AI model & review skill
+
+Open the gear menu to pick the AI model used across reviews, tests, pipeline,
+and architecture, and to select a **review skill** — Default, a rigorous
+*Code Review & Quality* profile, or your own pasted/uploaded `SKILL.md`-style
+prompt.
+
+![AI model and review skill configuration](docs/screens/02-model-config.png)
+
+### 1. AI Code Review
+
+Findings are grouped into four categories, each with a severity badge, line
+number, description, and an actionable fix suggestion. An overall letter grade
+(A+ → F) is shown in the top bar.
+
+| Category | Description |
+|----------|-------------|
+| **Bugs** | Logic errors, potential runtime exceptions, incorrect behavior |
+| **Security** | Vulnerabilities, injection risks, unsafe patterns |
+| **Quality** | Code smell, maintainability, architecture concerns |
+| **Suggestions** | Performance improvements, better practices, refactoring ideas |
+
+![Bugs tab](docs/screens/03-review-bugs.png)
+![Security tab](docs/screens/04-security.png)
+![Quality tab](docs/screens/05-quality.png)
+![Suggestions tab](docs/screens/06-suggestions.png)
+
+### 2. Edge-Case Testing (JS/TS)
+
+Generate boundary-condition tests with AI and run them safely in a browser
+sandbox — empty/null inputs, boundary values, overflow, and tricky control
+flow. Pass/fail status is shown per test, with downloadable results.
+
+![Edge-case test runner](docs/screens/07-edge-tests.png)
+
+### 3. Full Test Suite & Evaluation
+
+An AI-designed suite spanning seven categories (edge, unit, functional, API,
+A/B, vulnerability, CI/CD) with an overall grade, AI reasoning toggle, and
+actionable recommendations.
+
+![Full test suite and evaluation](docs/screens/08-test-suite.png)
+
+### 4. CI/CD Pipeline Simulation
+
+Simulates `lint → unit → integration → build → deploy` with realistic
+fail-fast behavior, per-stage logs, durations, and a final CI grade.
+
+![CI/CD pipeline simulation](docs/screens/09-cicd-pipeline.png)
+
+### 5. Architecture & Risk Mapping
+
+Reconstructs components, data flow, and a system diagram from the code, then
+surfaces potential architectural issues with severity and fixes.
+
+![Architecture and risk mapping](docs/screens/10-architecture.png)
+
+### 6. GitHub Repository Analysis
+
+Paste a public repo URL to map the file tree, detect language distribution,
+deep-review key source files, and surface repository-wide findings — then run
+tests, the suite, the pipeline, and architecture mapping on the key files.
+
+### 7. Export & Share
+
+Copy the full review as Markdown, and save edge-case, suite, and pipeline
+results as downloadable `.txt` reports.
 
 ---
 
