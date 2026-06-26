@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { LANGUAGES } from "@/lib/codescan-types";
-import { useServerFn } from "@tanstack/react-start";
-import { fetchGithubFile } from "@/lib/github.functions";
 
 const SAMPLE = `function getUser(req, db) {
   const id = req.query.id;
@@ -20,29 +18,8 @@ export function ManualInput({
 }) {
   const [code, setCode] = useState("");
   const [language, setLanguage] = useState<string>("JavaScript");
-  const [ghUrl, setGhUrl] = useState("");
-  const [ghError, setGhError] = useState<string | null>(null);
-  const [ghLoading, setGhLoading] = useState(false);
   const [repoUrl, setRepoUrl] = useState("");
   const [repoBranch, setRepoBranch] = useState("");
-  const getGithubFile = useServerFn(fetchGithubFile);
-
-  const handleFetch = async () => {
-    if (!ghUrl.trim() || ghLoading) return;
-    setGhError(null);
-    setGhLoading(true);
-    try {
-      const res = await getGithubFile({ data: { url: ghUrl.trim() } });
-      setCode(res.code);
-      if (LANGUAGES.includes(res.language as (typeof LANGUAGES)[number])) {
-        setLanguage(res.language);
-      }
-    } catch (e) {
-      setGhError(e instanceof Error ? e.message : "Failed to fetch file.");
-    } finally {
-      setGhLoading(false);
-    }
-  };
 
   return (
     <div className="flex flex-1 flex-col gap-4 px-4 py-4 md:px-6 lg:grid lg:grid-cols-[360px_1fr] lg:gap-6">
@@ -87,34 +64,6 @@ export function ManualInput({
           <p className="text-xs text-cs-muted">
             Maps the file tree and deep-reviews key source files.
           </p>
-        </div>
-        <div className="flex flex-col gap-2 rounded-lg border border-cs-border bg-cs-surface p-3">
-          <label htmlFor="gh-file-url" className="text-xs font-medium text-cs-muted">
-            Review from a public GitHub file
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              id="gh-file-url"
-              value={ghUrl}
-              onChange={(e) => setGhUrl(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleFetch();
-              }}
-              placeholder="https://github.com/owner/repo/blob/main/file.js"
-              spellCheck={false}
-              aria-label="Public GitHub file URL"
-              className="min-w-0 flex-1 rounded-md border border-cs-border bg-cs-surface-2 px-3 py-2.5 font-mono text-xs text-cs-text outline-none placeholder:text-cs-muted focus:border-cs-info"
-            />
-            <button
-              type="button"
-              onClick={handleFetch}
-              disabled={!ghUrl.trim() || ghLoading}
-              className="shrink-0 rounded-md border border-cs-border bg-cs-surface-2 px-3 py-2.5 text-sm text-cs-text transition-colors hover:border-cs-info disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {ghLoading ? "Fetching…" : "Fetch"}
-            </button>
-          </div>
-          {ghError && <p className="text-xs text-cs-critical">{ghError}</p>}
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor="language-select" className="sr-only">
