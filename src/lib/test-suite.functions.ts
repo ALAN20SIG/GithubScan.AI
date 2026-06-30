@@ -68,7 +68,49 @@ function extractJson(text: string): unknown {
   const start = raw.indexOf("{");
   const end = raw.lastIndexOf("}");
   if (start === -1 || end === -1) throw new Error("No JSON object in model response");
-  return JSON.parse(raw.slice(start, end + 1));
+  const slice = raw.slice(start, end + 1);
+  try {
+    return JSON.parse(slice);
+  } catch {
+    return JSON.parse(repairJson(raw.slice(start)));
+  }
+}
+
+// Best-effort repair of truncated JSON: close any open strings, objects, and arrays.
+function repairJson(input: string): string {
+  let out = "";
+  const stack: string[] = [];
+  let inString = false;
+  let escaped = false;
+  for (const ch of input) {
+    if (inString) {
+      out += ch;
+      if (escaped) escaped = false;
+      else if (ch === "\\") escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') {
+      inString = true;
+      out += ch;
+    } else if (ch === "{" || ch === "[") {
+      stack.push(ch);
+      out += ch;
+    } else if (ch === "}" || ch === "]") {
+      stack.pop();
+      out += ch;
+    } else {
+      out += ch;
+    }
+  }
+  if (inString) out += '"';
+  // Drop trailing comma/colon partials.
+  out = out.replace(/[,:]\s*$/, "");
+  while (stack.length) {
+    const open = stack.pop();
+    out += open === "{" ? "}" : "]";
+  }
+  return out;
 }
 
 const SECTION_LABELS: Record<SuiteKey, string> = {
